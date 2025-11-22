@@ -7,36 +7,52 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* 動畫效果 */
         .fade-in { animation: fadeIn 0.6s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .hidden-section { display: none; }
+        
+        /* 載入中轉圈圈 */
         .loading-spinner { animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* 模擬合約樣式 */
+        /* 模擬合約紙張樣式 */
         .legal-paper {
-            background-color: #fff;
-            border: 1px solid #d1d5db;
-            padding: 20px;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 24px;
             font-family: "Courier New", Courier, monospace;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #374151;
-            height: 250px;
+            height: 300px;
             overflow-y: scroll;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+            line-height: 1.6;
         }
+        
+        /* 數位印章效果 */
         .stamp {
-            border: 3px solid #ef4444;
+            border: 4px double #ef4444;
             color: #ef4444;
-            font-weight: bold;
-            padding: 5px 10px;
+            font-weight: 900;
+            padding: 8px 16px;
             text-transform: uppercase;
-            border-radius: 5px;
-            transform: rotate(-5deg);
+            border-radius: 8px;
+            transform: rotate(-8deg);
             display: inline-block;
+            letter-spacing: 2px;
+            font-family: sans-serif;
             animation: stamp-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0; /* 初始隱藏 */
         }
-        @keyframes stamp-in { from { transform: scale(2) rotate(0deg); opacity: 0; } to { transform: scale(1) rotate(-5deg); opacity: 1; } }
+        @keyframes stamp-in { from { transform: scale(2) rotate(0deg); opacity: 0; } to { transform: scale(1) rotate(-8deg); opacity: 1; } }
+
+        /* 簽名手寫字體模擬 */
+        .signature-font {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 1.5rem;
+            color: #1e40af;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
@@ -50,111 +66,136 @@
         </div>
     </nav>
 
-    <div id="valuationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
-        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl p-6 mx-4">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h3 class="text-xl font-bold text-yellow-700"><i class="fas fa-calculator mr-2"></i>AI 企業估值模擬系統</h3>
-                <button onclick="closeModal('valuationModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+    <div id="valuationModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-[60] hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl p-6 mx-4 relative animate-bounce-in">
+            <button onclick="closeModal('valuationModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            
+            <div class="flex items-center mb-6 border-b pb-4">
+                <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                    <i class="fas fa-robot text-yellow-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">AI 企業價值試算</h3>
+                    <p class="text-xs text-gray-500">基於平台 1,200+ 筆歷史成交數據模型</p>
+                </div>
             </div>
             
             <div id="valuationInput">
-                <div class="space-y-4">
+                <div class="space-y-5">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">所屬產業</label>
-                        <select id="industry" class="w-full border rounded p-2 bg-gray-50">
-                            <option value="software">軟體/SaaS (高倍數)</option>
-                            <option value="manufacturing">傳統製造 (中倍數)</option>
-                            <option value="retail">餐飲零售 (一般倍數)</option>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">所屬產業類別</label>
+                        <select id="industry" class="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-yellow-400 outline-none">
+                            <option value="software">資訊軟體 / SaaS (高成長)</option>
+                            <option value="manufacturing">傳統製造 / 精密加工</option>
+                            <option value="retail">連鎖餐飲 / 零售通路</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">年度營收 (Revenue)</label>
-                        <div class="relative">
-                            <span class="absolute left-3 top-2 text-gray-500">NT$</span>
-                            <input type="number" id="revenue" class="w-full border rounded p-2 pl-10" placeholder="例如: 50000000">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">年度營收 (Revenue)</label>
+                            <div class="relative">
+                                <input type="number" id="revenue" class="w-full border border-gray-300 rounded-lg p-2.5 pl-2 focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="輸入金額">
+                                <span class="absolute right-3 top-2.5 text-gray-400 text-sm">萬</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">稅前淨利 (EBITDA)</label>
+                            <div class="relative">
+                                <input type="number" id="ebitda" class="w-full border border-gray-300 rounded-lg p-2.5 pl-2 focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="輸入金額">
+                                <span class="absolute right-3 top-2.5 text-gray-400 text-sm">萬</span>
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">稅前淨利 (EBITDA)</label>
-                        <div class="relative">
-                            <span class="absolute left-3 top-2 text-gray-500">NT$</span>
-                            <input type="number" id="ebitda" class="w-full border rounded p-2 pl-10" placeholder="例如: 8000000">
-                        </div>
-                    </div>
-                    <button onclick="runValuation()" class="w-full bg-yellow-500 text-white font-bold py-3 rounded hover:bg-yellow-600 transition mt-2">
-                        開始 AI 運算
+                    <button onclick="runValuation()" class="w-full bg-yellow-500 text-white font-bold py-3 rounded-lg hover:bg-yellow-600 transition shadow-lg transform active:scale-95">
+                        開始 AI 運算 <i class="fas fa-bolt ml-2"></i>
                     </button>
                 </div>
             </div>
 
-            <div id="valuationLoading" class="hidden py-10 text-center">
-                <i class="fas fa-spinner loading-spinner text-4xl text-yellow-500 mb-4"></i>
-                <p class="text-gray-600 font-bold">正在分析同業成交數據...</p>
-                <p class="text-xs text-gray-400 mt-2">比對資料庫 1,240 筆交易紀錄</p>
+            <div id="valuationLoading" class="hidden py-12 text-center">
+                <div class="inline-block mb-4">
+                    <i class="fas fa-circle-notch loading-spinner text-5xl text-yellow-500"></i>
+                </div>
+                <h4 class="text-lg font-bold text-gray-800">AI 正在分析同業數據...</h4>
+                <p class="text-sm text-gray-500 mt-2">比對參數：EBITDA 倍數、產業風險係數、市場流動性</p>
             </div>
 
-            <div id="valuationResult" class="hidden">
-                <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center mb-4">
-                    <p class="text-sm text-gray-600 mb-1">根據 EBITDA 倍數法推算，您的企業估值區間為：</p>
-                    <div class="text-3xl font-bold text-green-700 my-2">
-                        <span id="valMin"></span> ~ <span id="valMax"></span> 萬
+            <div id="valuationResult" class="hidden text-center">
+                <div class="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
+                    <p class="text-sm text-gray-600 mb-2">預估市場交易價格區間</p>
+                    <div class="text-4xl font-extrabold text-green-700 my-3 tracking-tight">
+                        NT$ <span id="valMin"></span> ~ <span id="valMax"></span> 萬
                     </div>
-                    <div class="text-xs text-gray-500">信心水準: 85% | 參考樣本: 32 間同規模企業</div>
+                    <div class="inline-flex items-center bg-white px-3 py-1 rounded-full border border-green-100 shadow-sm">
+                        <i class="fas fa-chart-line text-green-500 mr-2"></i>
+                        <span class="text-xs text-gray-600">信心水準: 85% (參考樣本: 32 筆)</span>
+                    </div>
                 </div>
-                <div class="text-xs text-gray-400 mb-4 text-justify">
-                    *此估值僅供參考，實際成交價可能因專利、團隊留任狀況而有溢價。建議諮詢平台顧問進行深度DD。
+                <div class="text-left text-xs text-gray-500 mb-6 space-y-1 bg-gray-50 p-3 rounded">
+                    <p><i class="fas fa-info-circle mr-1"></i> 估值僅供參考，實際成交價受專利、團隊留任影響。</p>
+                    <p><i class="fas fa-lightbulb mr-1"></i> 建議下一步：預約顧問進行深度DD (Due Diligence)。</p>
                 </div>
-                <button onclick="closeModal('valuationModal')" class="w-full border border-gray-300 text-gray-600 py-2 rounded hover:bg-gray-100">
-                    關閉並儲存報告
+                <button onclick="closeModal('valuationModal')" class="w-full border border-gray-300 text-gray-700 py-2.5 rounded-lg hover:bg-gray-100 font-bold transition">
+                    儲存報告並關閉
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="ndaModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
-        <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl p-6 mx-4">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-file-signature mr-2 text-blue-600"></i>標準化保密協定 (NDA) 簽署</h3>
-                <button onclick="closeModal('ndaModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-            </div>
+    <div id="ndaModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-[60] hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl p-6 mx-4 relative">
+            <button onclick="closeModal('ndaModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
 
-            <div class="legal-paper mb-4 custom-scrollbar">
-                <h4 class="text-center font-bold mb-4 text-lg">NON-DISCLOSURE AGREEMENT</h4>
-                <p class="mb-2"><strong>THIS AGREEMENT</strong> is made on <span id="todayDate" class="underline"></span> between:</p>
-                <p class="mb-4">(1) <strong>Platform User</strong> (the "Disclosing Party"); and <br> (2) <strong>Potential Buyer</strong> (the "Receiving Party").</p>
-                <p class="mb-2 font-bold">1. Definition of Confidential Information</p>
-                <p class="mb-4">"Confidential Information" means all information disclosed by the Disclosing Party to the Receiving Party, including but not limited to financial statements, customer lists, trade secrets, and technical data.</p>
-                <p class="mb-2 font-bold">2. Obligations</p>
-                <p class="mb-4">The Receiving Party agrees to hold and maintain the Confidential Information in strictest confidence for the sole and exclusive benefit of the Disclosing Party.</p>
-                <p class="mb-2 font-bold">3. Term</p>
-                <p class="mb-4">The obligations of this Agreement shall survive for a period of two (2) years from the date hereof.</p>
-                <p class="mb-4 text-gray-400">[...Scroll down to sign...]</p>
-                <p class="mb-2 font-bold">4. Governing Law</p>
-                <p class="mb-4">This Agreement shall be governed by and construed in accordance with the laws of Taiwan (R.O.C).</p>
-            </div>
-
-            <div id="signSection">
-                <div class="flex items-end gap-4">
-                    <div class="flex-grow">
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Authorized Signature (Type Name)</label>
-                        <input type="text" id="signerName" class="w-full border-b-2 border-gray-300 bg-gray-50 p-2 focus:border-blue-500 outline-none font-serif text-lg" placeholder="請輸入您的全名以示簽署">
-                    </div>
-                    <button onclick="signNDA()" class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition font-bold">
-                        數位簽署
-                    </button>
+            <div class="flex items-center mb-4 border-b pb-4">
+                <div class="bg-blue-100 p-3 rounded-full mr-4">
+                    <i class="fas fa-file-signature text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">標準化保密協定 (NDA)</h3>
+                    <p class="text-xs text-gray-500">數位簽署具有法律效力，並即時產生時間戳記</p>
                 </div>
             </div>
 
-            <div id="signedStatus" class="hidden border-t mt-4 pt-4">
-                <div class="flex justify-between items-center">
+            <div class="legal-paper mb-6 custom-scrollbar">
+                <div class="text-center font-bold text-lg mb-6 border-b-2 border-black pb-2 inline-block mx-auto">NON-DISCLOSURE AGREEMENT</div>
+                <p class="mb-4"><strong>Effective Date:</strong> <span id="todayDate" class="font-bold"></span></p>
+                
+                <p class="mb-2 font-bold uppercase text-xs tracking-wider">1. Parties</p>
+                <p class="mb-4 text-justify">This Agreement is between the <strong>Disclosing Party</strong> (The Seller) and the <strong>Receiving Party</strong> (You). Both parties agree to protect the confidentiality of the shared business information.</p>
+                
+                <p class="mb-2 font-bold uppercase text-xs tracking-wider">2. Confidential Information</p>
+                <p class="mb-4 text-justify">"Confidential Information" includes but is not limited to: Financial Data, Customer Lists, Trade Secrets, IP, and Operational Strategies.</p>
+                
+                <p class="mb-2 font-bold uppercase text-xs tracking-wider">3. Non-Disclosure Obligations</p>
+                <p class="mb-4 text-justify">The Receiving Party agrees NOT to disclose, copy, or use the information for any purpose other than evaluating the potential acquisition.</p>
+                
+                <p class="mb-4 text-center text-gray-400 text-xs">--- End of Preview ---</p>
+            </div>
+
+            <div id="signSection" class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Electronic Signature (Type your full name)</label>
+                <div class="flex gap-3">
+                    <input type="text" id="signerName" class="flex-grow border-b-2 border-gray-400 bg-transparent p-2 focus:border-blue-600 outline-none font-serif text-xl text-blue-900 placeholder-gray-300" placeholder="Ex: Wang Xiao-Ming">
+                    <button onclick="signNDA()" class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition font-bold whitespace-nowrap">
+                        同意並簽署
+                    </button>
+                </div>
+                <p class="text-xs text-gray-400 mt-2"><i class="fas fa-lock mr-1"></i> 此操作將產生不可竄改的數位簽章雜湊值 (Hash)。</p>
+            </div>
+
+            <div id="signedStatus" class="hidden border-t border-gray-100 pt-6">
+                <div class="flex justify-between items-center bg-green-50 p-4 rounded-lg border border-green-100">
                     <div>
-                        <p class="text-sm text-green-700 font-bold"><i class="fas fa-check-circle"></i> 簽署完成 (Legally Binding)</p>
-                        <p class="text-xs text-gray-500">Hash: 8f434346-3ad0-4e59... <span id="signTime"></span></p>
+                        <div class="flex items-center mb-1">
+                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                            <span class="text-green-800 font-bold">簽署完成 (Signed)</span>
+                        </div>
+                        <p class="text-xs text-gray-500 font-mono">Hash: 0x7f83...b2a9 <br> Time: <span id="signTime"></span></p>
                     </div>
                     <div class="stamp">DIGITALLY SIGNED</div>
                 </div>
-                <button onclick="closeModal('ndaModal')" class="w-full mt-4 bg-gray-100 text-gray-600 py-2 rounded hover:bg-gray-200 text-sm">
-                    下載副本並關閉
+                <button onclick="closeModal('ndaModal')" class="w-full mt-4 bg-gray-100 text-gray-600 py-2.5 rounded-lg hover:bg-gray-200 font-bold text-sm transition">
+                    下載副本並關閉視窗
                 </button>
             </div>
         </div>
@@ -167,156 +208,249 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div onclick="showSection('consultant')" class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition cursor-pointer border-t-8 border-blue-800 group relative overflow-hidden p-8">
+            <div onclick="showSection('consultant')" class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition cursor-pointer border-t-8 border-blue-800 group relative overflow-hidden p-8 transform hover:-translate-y-1">
                 <div class="mb-6 text-center">
-                    <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                    <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
                         <i class="fas fa-user-injured text-3xl text-blue-800"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-gray-800">剛萌生退意，家族溝通卡關</h3>
                     <p class="text-sm text-gray-500 mt-2">60歲 傳統餐飲業老闆</p>
                 </div>
+                <div class="space-y-2 mb-6">
+                    <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded"><i class="fas fa-quote-left text-blue-300 mr-2"></i>兒子不想接，覺得賣店很丟臉...</p>
+                </div>
                 <button class="w-full bg-blue-800 text-white py-3 rounded-lg font-bold hover:bg-blue-900 transition">進入【顧問型平台】</button>
             </div>
 
-            <div onclick="showSection('comprehensive')" class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition cursor-pointer border-t-8 border-yellow-500 group relative overflow-hidden p-8">
+            <div onclick="showSection('comprehensive')" class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition cursor-pointer border-t-8 border-yellow-500 group relative overflow-hidden p-8 transform hover:-translate-y-1">
                 <div class="mb-6 text-center">
-                    <div class="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                    <div class="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
                         <i class="fas fa-bullhorn text-3xl text-yellow-600"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-gray-800">確認出售，需要市場曝光</h3>
                     <p class="text-sm text-gray-500 mt-2">35歲 軟體新創創辦人</p>
                 </div>
+                <div class="space-y-2 mb-6">
+                    <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded"><i class="fas fa-quote-left text-yellow-400 mr-2"></i>帳務透明，想快速脫手去創業。</p>
+                </div>
                 <button class="w-full bg-yellow-500 text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition">進入【綜合型平台】</button>
             </div>
 
-            <div onclick="showSection('closed')" class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition cursor-pointer border-t-8 border-gray-800 group relative overflow-hidden p-8">
+            <div onclick="showSection('closed')" class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition cursor-pointer border-t-8 border-gray-800 group relative overflow-hidden p-8 transform hover:-translate-y-1">
                 <div class="mb-6 text-center">
-                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
                         <i class="fas fa-user-secret text-3xl text-gray-800"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-gray-800">深度談判，涉及敏感資訊</h3>
                     <p class="text-sm text-gray-500 mt-2">70歲 精密機械董事長</p>
+                </div>
+                <div class="space-y-2 mb-6">
+                    <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded"><i class="fas fa-quote-left text-gray-400 mr-2"></i>關鍵技術不能外流，需嚴格保密。</p>
                 </div>
                 <button class="w-full bg-gray-800 text-white py-3 rounded-lg font-bold hover:bg-gray-900 transition">進入【封閉型平台】</button>
             </div>
         </div>
     </div>
 
-    <div id="consultant" class="hidden-section min-h-screen pt-20 fade-in bg-blue-50">
+    <div id="consultant" class="hidden-section min-h-screen pt-24 fade-in bg-blue-50">
         <div class="container mx-auto px-6">
-            <button onclick="showSection('landing')" class="mb-4 text-blue-800 hover:underline font-bold"><i class="fas fa-arrow-left"></i> 返回情境選擇</button>
+            <button onclick="showSection('landing')" class="mb-6 text-blue-800 hover:underline font-bold flex items-center"><i class="fas fa-arrow-left mr-2"></i> 返回情境選擇</button>
+            
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-800 h-fit">
-                    <h2 class="text-2xl font-bold text-blue-900 mb-4">顧問型平台</h2>
-                    <p class="text-gray-600 text-sm mb-4">針對尚未準備好的企業，提供心理輔導與財務體檢 [cite: 200-202]。</p>
-                    <ul class="space-y-2 text-sm text-gray-700">
-                        <li><i class="fas fa-check text-blue-500 mr-2"></i>心理/意願輔導</li>
-                        <li><i class="fas fa-check text-blue-500 mr-2"></i>初步估值與資訊整備</li>
+                    <div class="flex items-center mb-4">
+                        <span class="bg-blue-800 text-white px-3 py-1 rounded text-sm font-bold mr-2">Type 1</span>
+                        <h2 class="text-2xl font-bold text-blue-900">顧問型平台</h2>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">適用於尚未準備好的企業，重點在於「心理建設」與「體質調整」。</p>
+                    
+                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">介入時機</h4>
+                    <ul class="space-y-2 text-gray-700 text-sm mb-6">
+                        <li class="flex items-start"><i class="fas fa-check text-blue-500 mt-1 mr-2"></i> 創辦人開始表達退休意向</li>
+                        <li class="flex items-start"><i class="fas fa-check text-blue-500 mt-1 mr-2"></i> 家族溝通停滯</li>
+                        <li class="flex items-start"><i class="fas fa-check text-blue-500 mt-1 mr-2"></i> 企業缺乏正式接班規劃</li>
+                    </ul>
+
+                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">平台特色功能</h4>
+                    <ul class="space-y-2 text-gray-700 text-sm">
+                        <li class="bg-blue-50 p-2 rounded"><i class="fas fa-stethoscope mr-2 text-blue-600"></i> 企業診斷 (財務/營運/風險)</li>
+                        <li class="bg-blue-50 p-2 rounded"><i class="fas fa-hand-holding-heart mr-2 text-blue-600"></i> 心理/意願輔導 (降低抗拒)</li>
+                        <li class="bg-blue-50 p-2 rounded"><i class="fas fa-seedling mr-2 text-blue-600"></i> 導入接班/外部承接概念</li>
                     </ul>
                 </div>
+
                 <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-8">
-                    <h3 class="text-lg font-bold mb-4 text-gray-700">企業體質與意願診斷</h3>
-                    <div class="bg-gray-100 p-6 rounded-lg text-center">
-                        <p class="text-gray-600 mb-4">顧問型介面著重於「教育」與「引導」，而非直接交易。</p>
-                        <div class="w-full bg-gray-300 rounded-full h-4 mb-2">
-                            <div class="bg-blue-600 h-4 rounded-full" style="width: 40%"></div>
+                    <div class="border-b pb-4 mb-6 flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-gray-800">平台演示：接班意願與體質快篩</h3>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold">輔導模式</span>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                        <h4 class="font-bold mb-4 flex items-center"><i class="fas fa-user-clock text-blue-600 mr-2"></i> 經營者心理準備度評估</h4>
+                        <div class="mb-2 flex justify-between text-sm text-gray-600">
+                            <span>當前狀態：抗拒外部接班</span>
+                            <span class="font-bold text-orange-500">風險偏高</span>
                         </div>
-                        <p class="text-xs text-blue-600">接班準備度：40% (建議先進行財務重整)</p>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-orange-500 h-3 rounded-full" style="width: 35%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">系統建議：啟動「家族傳承工作坊」，邀請專業顧問介入溝通。</p>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h4 class="font-bold mb-4 flex items-center"><i class="fas fa-file-invoice-dollar text-blue-600 mr-2"></i> 財務體質簡易診斷</h4>
+                        <div class="grid grid-cols-2 gap-4 text-center">
+                            <div class="bg-white p-4 rounded border">
+                                <div class="text-gray-500 text-xs">財務透明度</div>
+                                <div class="text-red-500 text-2xl font-bold">C-</div>
+                            </div>
+                            <div class="bg-white p-4 rounded border">
+                                <div class="text-gray-500 text-xs">獲利穩定性</div>
+                                <div class="text-green-500 text-2xl font-bold">A</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="comprehensive" class="hidden-section min-h-screen pt-20 fade-in bg-yellow-50">
+    <div id="comprehensive" class="hidden-section min-h-screen pt-24 fade-in bg-yellow-50">
         <div class="container mx-auto px-6">
-            <button onclick="showSection('landing')" class="mb-4 text-yellow-700 hover:underline font-bold"><i class="fas fa-arrow-left"></i> 返回情境選擇</button>
+            <button onclick="showSection('landing')" class="mb-6 text-yellow-700 hover:underline font-bold flex items-center"><i class="fas fa-arrow-left mr-2"></i> 返回情境選擇</button>
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 h-fit">
-                    <h2 class="text-2xl font-bold text-yellow-700 mb-4">綜合型平台</h2>
-                    <p class="text-gray-600 text-sm mb-4">透過數位工具與標準化流程，降低資訊不對稱 。</p>
-                    <ul class="space-y-3 text-gray-700 text-sm">
-                        <li class="bg-yellow-50 p-2 rounded border border-yellow-200">
-                            <strong><i class="fas fa-bullseye mr-2"></i>智能媒合</strong><br>
-                            資料審核與企業篩選
-                        </li>
-                        <li class="bg-yellow-50 p-2 rounded border border-yellow-200">
-                            <strong><i class="fas fa-file-contract mr-2"></i>標準化工具</strong><br>
-                            NDA、線上估值工具
-                        </li>
+                    <div class="flex items-center mb-4">
+                        <span class="bg-yellow-500 text-white px-3 py-1 rounded text-sm font-bold mr-2">Type 2</span>
+                        <h2 class="text-2xl font-bold text-yellow-700">綜合型平台</h2>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">透過數位工具與標準化流程，降低資訊不對稱，提升媒合效率。</p>
+                    
+                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">介入時機</h4>
+                    <ul class="space-y-2 text-gray-700 text-sm mb-6">
+                        <li class="flex items-start"><i class="fas fa-check text-yellow-500 mt-1 mr-2"></i> 企業主確認外部接班可行</li>
+                        <li class="flex items-start"><i class="fas fa-check text-yellow-500 mt-1 mr-2"></i> 必須尋找買家、需要市場曝光</li>
+                        <li class="flex items-start"><i class="fas fa-check text-yellow-500 mt-1 mr-2"></i> 接班壓力增加</li>
+                    </ul>
+
+                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">平台特色功能</h4>
+                    <ul class="space-y-2 text-gray-700 text-sm">
+                        <li class="bg-yellow-50 p-2 rounded"><i class="fas fa-bullseye mr-2 text-yellow-600"></i> 案件刊登、媒合推送</li>
+                        <li class="bg-yellow-50 p-2 rounded"><i class="fas fa-filter mr-2 text-yellow-600"></i> 資料審核與企業篩選</li>
+                        <li class="bg-yellow-50 p-2 rounded"><i class="fas fa-file-contract mr-2 text-yellow-600"></i> 標準化流程 (NDA、估值工具)</li>
                     </ul>
                 </div>
 
-                <div class="lg:col-span-2 bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="bg-gray-50 border-b p-4 flex justify-between items-center">
-                        <span class="font-bold text-gray-700">平台工具演示 (Interactive Tools)</span>
-                        <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Live Demo</span>
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-8">
+                    <div class="border-b pb-4 mb-6 flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-gray-800">平台演示：智能交易工具箱</h3>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-bold">市場模式</span>
                     </div>
-                    <div class="p-6">
-                        <div class="flex flex-col md:flex-row gap-4 mb-6">
-                            <div onclick="openModal('valuationModal')" class="flex-1 bg-white border-2 border-yellow-100 p-4 rounded-lg shadow-sm flex items-center cursor-pointer hover:border-yellow-400 hover:shadow-md transition group">
-                                <div class="bg-yellow-100 w-12 h-12 rounded-full flex items-center justify-center mr-4 group-hover:bg-yellow-500 group-hover:text-white transition">
-                                    <i class="fas fa-calculator text-xl text-yellow-600 group-hover:text-white"></i>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-800">線上自動估值</div>
-                                    <div class="text-xs text-gray-500">輸入財報，AI即時運算價格</div>
-                                </div>
-                            </div>
-                            <div onclick="openModal('ndaModal')" class="flex-1 bg-white border-2 border-blue-100 p-4 rounded-lg shadow-sm flex items-center cursor-pointer hover:border-blue-400 hover:shadow-md transition group">
-                                <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mr-4 group-hover:bg-blue-600 group-hover:text-white transition">
-                                    <i class="fas fa-file-signature text-xl text-blue-600 group-hover:text-white"></i>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-800">簽署保密協定 (NDA)</div>
-                                    <div class="text-xs text-gray-500">模擬數位簽約與時間戳記</div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <h3 class="text-sm font-bold text-gray-500 mb-3 uppercase">推薦買家清單 (Matched Buyers)</h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center">
-                                    <div class="bg-yellow-100 text-yellow-700 w-10 h-10 rounded flex items-center justify-center font-bold mr-3">A</div>
-                                    <div>
-                                        <div class="font-bold text-gray-800">教育科技控股集團</div>
-                                        <div class="text-xs text-gray-500"><i class="fas fa-check-circle text-green-500"></i> 資料已審核</div>
-                                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div onclick="openModal('valuationModal')" class="border-2 border-yellow-100 rounded-xl p-5 cursor-pointer hover:border-yellow-400 hover:shadow-lg transition group bg-yellow-50">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 rounded-full bg-yellow-500 text-white flex items-center justify-center mr-3 shadow">
+                                    <i class="fas fa-calculator"></i>
                                 </div>
-                                <button class="text-xs bg-gray-100 px-3 py-1 rounded">等待簽署 NDA</button>
+                                <h4 class="font-bold text-gray-800">線上自動估值</h4>
+                            </div>
+                            <p class="text-sm text-gray-600">點擊模擬輸入財報數據，AI 系統即時運算價格區間。</p>
+                        </div>
+                        <div onclick="openModal('ndaModal')" class="border-2 border-blue-100 rounded-xl p-5 cursor-pointer hover:border-blue-400 hover:shadow-lg transition group bg-blue-50">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3 shadow">
+                                    <i class="fas fa-file-signature"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-800">簽署保密協定 (NDA)</h4>
+                            </div>
+                            <p class="text-sm text-gray-600">點擊模擬數位簽署流程，體驗標準化合約與時間戳記。</p>
+                        </div>
+                    </div>
+
+                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-3">智能媒合結果預覽</h4>
+                    <div class="border rounded-lg p-4 flex justify-between items-center hover:bg-gray-50 transition">
+                        <div class="flex items-center">
+                            <div class="bg-gray-800 text-white w-10 h-10 rounded flex items-center justify-center font-bold mr-4">A</div>
+                            <div>
+                                <div class="font-bold text-gray-800">某大型教育科技集團</div>
+                                <div class="text-xs text-gray-500"><i class="fas fa-check-circle text-green-500"></i> 企業認證 | 意願度: 高</div>
                             </div>
                         </div>
+                        <button class="text-xs bg-yellow-100 text-yellow-800 px-3 py-1 rounded font-bold">查看出價</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="closed" class="hidden-section min-h-screen pt-20 fade-in bg-gray-900 text-white">
+    <div id="closed" class="hidden-section min-h-screen pt-24 fade-in bg-gray-900 text-white">
         <div class="container mx-auto px-6">
-            <button onclick="showSection('landing')" class="mb-4 text-gray-400 hover:text-white font-bold"><i class="fas fa-arrow-left"></i> 返回情境選擇</button>
+            <button onclick="showSection('landing')" class="mb-6 text-gray-400 hover:text-white font-bold flex items-center"><i class="fas fa-arrow-left mr-2"></i> 返回情境選擇</button>
+            
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-gray-500 h-fit">
-                    <h2 class="text-2xl font-bold text-white mb-4">封閉型平台</h2>
-                    <p class="text-gray-300 text-sm mb-4">針對高敏感案件，提供VDR與履約保證 [cite: 208-209]。</p>
-                    <ul class="space-y-2 text-sm text-gray-400">
-                        <li><i class="fas fa-lock text-green-500 mr-2"></i>虛擬資料室 (VDR)</li>
-                        <li><i class="fas fa-balance-scale text-green-500 mr-2"></i>Escrow 履約保證</li>
+                    <div class="flex items-center mb-4">
+                        <span class="bg-gray-600 text-white px-3 py-1 rounded text-sm font-bold mr-2">Type 3</span>
+                        <h2 class="text-2xl font-bold text-white">封閉型平台</h2>
+                    </div>
+                    <p class="text-gray-300 text-sm mb-4">針對高敏感案件，提供最高等級的保密與履約管理。</p>
+                    
+                    <h4 class="text-xs font-bold text-gray-500 uppercase mb-2">介入時機</h4>
+                    <ul class="space-y-2 text-gray-300 text-sm mb-6">
+                        <li class="flex items-start"><i class="fas fa-check text-green-500 mt-1 mr-2"></i> 已找到明確買家</li>
+                        <li class="flex items-start"><i class="fas fa-check text-green-500 mt-1 mr-2"></i> 進入深度談判、涉及敏感資訊</li>
+                        <li class="flex items-start"><i class="fas fa-check text-green-500 mt-1 mr-2"></i> 雙方準備進行正式交接</li>
+                    </ul>
+
+                    <h4 class="text-xs font-bold text-gray-500 uppercase mb-2">平台特色功能</h4>
+                    <ul class="space-y-2 text-gray-300 text-sm">
+                        <li class="bg-gray-700 p-2 rounded"><i class="fas fa-user-shield mr-2 text-green-400"></i> 嚴格會員制+高保密媒合</li>
+                        <li class="bg-gray-700 p-2 rounded"><i class="fas fa-balance-scale mr-2 text-green-400"></i> 合規審查與契約支持 (Escrow)</li>
+                        <li class="bg-gray-700 p-2 rounded"><i class="fas fa-hands-helping mr-2 text-green-400"></i> 協助併購後整合 (PMI)</li>
                     </ul>
                 </div>
-                <div class="lg:col-span-2 bg-gray-800 p-8 rounded-lg border border-gray-700">
-                    <h3 class="font-bold text-gray-200 mb-4">VDR 資料室展示</h3>
-                    <div class="bg-gray-700 p-4 rounded flex justify-between items-center">
-                        <div class="flex items-center">
-                            <i class="fas fa-file-pdf text-red-400 mr-3"></i>
-                            <div>
-                                <div class="font-bold">關鍵專利技術書.pdf</div>
-                                <div class="text-xs text-gray-400">加密等級：AES-256</div>
+
+                <div class="lg:col-span-2 bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-700">
+                    <div class="border-b border-gray-700 pb-4 mb-6 flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-gray-100">平台演示：VDR 虛擬資料室</h3>
+                        <span class="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded font-bold">治理模式</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-gray-700 p-4 rounded-lg flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-pdf text-red-400 text-2xl mr-4"></i>
+                                <div>
+                                    <div class="font-bold text-white">關鍵專利技術說明書.pdf</div>
+                                    <div class="text-xs text-gray-400">敏感等級: 極高 (AES-256 加密)</div>
+                                </div>
+                            </div>
+                            <button class="bg-gray-900 text-gray-500 px-3 py-1 rounded text-xs cursor-not-allowed"><i class="fas fa-lock mr-1"></i> 權限鎖定</button>
+                        </div>
+
+                        <div class="bg-gray-700 p-4 rounded-lg flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-excel text-green-500 text-2xl mr-4"></i>
+                                <div>
+                                    <div class="font-bold text-white">前十大客戶合約清單.xlsx</div>
+                                    <div class="text-xs text-gray-400">敏感等級: 高 (僅限受邀者)</div>
+                                </div>
+                            </div>
+                            <button class="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-500">申請存取</button>
+                        </div>
+
+                        <div class="mt-8 pt-6 border-t border-gray-700">
+                            <h4 class="text-xs font-bold text-gray-500 uppercase mb-3">交易履約保證 (Escrow Status)</h4>
+                            <div class="flex gap-4">
+                                <div class="flex-1 bg-gray-900 p-4 rounded border-l-4 border-green-500">
+                                    <div class="text-xs text-gray-400">履約保證金</div>
+                                    <div class="text-xl font-bold text-white">NT$ 5,000,000</div>
+                                    <div class="text-xs text-green-400 mt-1"><i class="fas fa-check-circle"></i> 已入帳託管</div>
+                                </div>
                             </div>
                         </div>
-                        <button class="text-xs bg-gray-900 px-3 py-1 rounded text-gray-400">權限鎖定</button>
                     </div>
                 </div>
             </div>
@@ -324,31 +458,41 @@
     </div>
 
     <script>
-        // 頁面切換邏輯
+        // 1. 頁面切換功能
         function showSection(sectionId) {
+            // 隱藏所有區塊
             ['landing', 'consultant', 'comprehensive', 'closed'].forEach(id => {
                 document.getElementById(id).classList.add('hidden-section');
             });
+            
+            // 顯示目標區塊並重置動畫
             const selected = document.getElementById(sectionId);
             selected.classList.remove('hidden-section');
             selected.classList.remove('fade-in');
-            void selected.offsetWidth;
+            void selected.offsetWidth; // 觸發重繪 (Reflow)
             selected.classList.add('fade-in');
+            
+            // 捲動到頂部
             window.scrollTo(0, 0);
         }
 
-        // Modal 開關邏輯
+        // 2. Modal 開啟/關閉
         function openModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
-            // 重置 NDA 日期
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            
+            // 初始化: 設定 NDA 日期
             if(modalId === 'ndaModal') {
-                const today = new Date().toISOString().split('T')[0];
+                const today = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
                 document.getElementById('todayDate').innerText = today;
+                
+                // 重置簽署狀態
+                document.getElementById('signSection').classList.remove('hidden');
+                document.getElementById('signedStatus').classList.add('hidden');
+                document.getElementById('signerName').value = '';
             }
-        }
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-            // 重置估值狀態
+            
+            // 初始化: 重置估值狀態
             if(modalId === 'valuationModal') {
                 document.getElementById('valuationInput').classList.remove('hidden');
                 document.getElementById('valuationLoading').classList.add('hidden');
@@ -356,43 +500,43 @@
                 document.getElementById('revenue').value = '';
                 document.getElementById('ebitda').value = '';
             }
-            // 重置 NDA 狀態
-            if(modalId === 'ndaModal') {
-                document.getElementById('signSection').classList.remove('hidden');
-                document.getElementById('signedStatus').classList.add('hidden');
-                document.getElementById('signerName').value = '';
-            }
         }
 
-        // 功能 1: 估值運算邏輯
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // 3. 功能邏輯: 估值運算
         function runValuation() {
             const rev = document.getElementById('revenue').value;
             const ebitda = document.getElementById('ebitda').value;
             const industry = document.getElementById('industry').value;
 
             if (!rev || !ebitda) {
-                alert('請輸入完整的財務數字');
+                alert('請輸入完整的財務數字以進行運算');
                 return;
             }
 
-            // 1. 切換到 Loading
+            // 切換 UI 到 Loading
             document.getElementById('valuationInput').classList.add('hidden');
             document.getElementById('valuationLoading').classList.remove('hidden');
 
-            // 2. 模擬運算 (延遲 1.5 秒)
+            // 模擬 1.5 秒運算延遲
             setTimeout(() => {
                 document.getElementById('valuationLoading').classList.add('hidden');
                 document.getElementById('valuationResult').classList.remove('hidden');
 
-                // 簡單的估值倍數邏輯
+                // 簡單的倍數邏輯 (僅供展示)
                 let multiplier = 3;
-                if (industry === 'software') multiplier = 6;
-                else if (industry === 'manufacturing') multiplier = 4;
-
-                // 加上隨機波動讓數字看起來真實
-                const baseVal = (ebitda * multiplier);
-                const minVal = Math.floor((baseVal * 0.9) / 10000); // 萬
-                const maxVal = Math.floor((baseVal * 1.2) / 10000); // 萬
+                if (industry === 'software') multiplier = 6.5; // 軟體倍數高
+                else if (industry === 'manufacturing') multiplier = 4.2; // 製造業
+                
+                // 加上隨機波動 (讓每次結果稍微不同，更真實)
+                const randomFactor = 0.95 + Math.random() * 0.1; // 0.95 ~ 1.05
+                const baseVal = (ebitda * multiplier * randomFactor);
+                
+                const minVal = Math.floor((baseVal * 0.9)); 
+                const maxVal = Math.floor((baseVal * 1.15)); 
 
                 document.getElementById('valMin').innerText = minVal.toLocaleString();
                 document.getElementById('valMax').innerText = maxVal.toLocaleString();
@@ -400,19 +544,21 @@
             }, 1500);
         }
 
-        // 功能 2: NDA 簽署邏輯
+        // 4. 功能邏輯: NDA 簽署
         function signNDA() {
             const name = document.getElementById('signerName').value;
-            if (!name) {
-                alert('請輸入簽署人姓名');
+            if (!name || name.length < 2) {
+                alert('請輸入簽署人全名');
                 return;
             }
 
+            // 切換 UI 到已簽署
             document.getElementById('signSection').classList.add('hidden');
             document.getElementById('signedStatus').classList.remove('hidden');
             
+            // 顯示當前時間
             const now = new Date();
-            document.getElementById('signTime').innerText = now.toLocaleString();
+            document.getElementById('signTime').innerText = now.toLocaleString('zh-TW');
         }
     </script>
 </body>
