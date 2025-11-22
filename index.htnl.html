@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第7組 - 接班預警 × 平台介入架構展示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .fade-in { animation: fadeIn 0.6s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden-section { display: none; }
+        
+        /* 自定義報告中的重點標籤樣式 */
+        .report-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <nav class="bg-white shadow-sm fixed w-full z-50">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center cursor-pointer" onclick="showSection('landing')">
+                <span class="text-xl font-bold text-gray-800"><i class="fas fa-project-diagram mr-2 text-blue-600"></i>接班預警 × 平台介入架構</span>
+            </div>
+            <div class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">第7組專題成果展示</div>
+        </div>
+    </nav>
+
+    <div id="landing" class="min-h-screen pt-24 pb-10 px-6 container mx-auto fade-in">
+        <div class="text-center mb-12">
+            <h1 class="text-3xl md:text-5xl font-bold mb-6 text-gray-800">請選擇企業當前的情境</h1>
+            <p class="text-xl text-gray-600">我們依據報告分析，針對不同階段的中小企業提供對應的平台解決方案</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div onclick="showSection('consultant')" class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition cursor-pointer border-t-8 border-blue-800 group relative overflow-hidden">
+                <div class="p-8">
+                    <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-bl-lg">情境 A</div>
+                    <div class="mb-6 text-center">
+                        <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                            <i class="fas fa-user-injured text-3xl text-blue-800"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 group-hover:text-blue-800 transition">剛萌生退意，家族溝通卡關</h3>
+                        <p class="text-sm text-gray-500 mt-2">60歲 傳統餐飲業老闆</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg text-gray-600 text-sm mb-6">
+                        <p class="mb-2"><i class="fas fa-exclamation-circle text-blue-600 mr-2"></i>兒子不想接，覺得賣店很丟臉...</p>
+                        <p><i class="fas fa-exclamation-circle text-blue-600 mr-2"></i>完全不懂公司值多少錢。</p>
+                    </div>
+                    <button class="w-full bg-blue-800 text-white py-3 rounded-lg font-bold hover:bg-blue-900 transition flex justify-center items-center">
+                        進入【顧問型平台】 <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div onclick="showSection('comprehensive')" class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition cursor-pointer border-t-8 border-yellow-500 group relative overflow-hidden">
+                <div class="p-8">
+                    <div class="absolute top-0 right-0 bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-bl-lg">情境 B</div>
+                    <div class="mb-6 text-center">
+                        <div class="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                            <i class="fas fa-bullhorn text-3xl text-yellow-600"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 group-hover:text-yellow-600 transition">確認出售，需要市場曝光</h3>
+                        <p class="text-sm text-gray-500 mt-2">35歲 軟體新創創辦人</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg text-gray-600 text-sm mb-6">
+                        <p class="mb-2"><i class="fas fa-check-circle text-yellow-500 mr-2"></i>帳務透明，想快速脫手去創業。</p>
+                        <p><i class="fas fa-check-circle text-yellow-500 mr-2"></i>需要廣泛尋找潛在買家。</p>
+                    </div>
+                    <button class="w-full bg-yellow-500 text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition flex justify-center items-center">
+                        進入【綜合型平台】 <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div onclick="showSection('closed')" class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition cursor-pointer border-t-8 border-gray-800 group relative overflow-hidden">
+                <div class="p-8">
+                    <div class="absolute top-0 right-0 bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1 rounded-bl-lg">情境 C</div>
+                    <div class="mb-6 text-center">
+                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                            <i class="fas fa-user-secret text-3xl text-gray-800"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 group-hover:text-black transition">深度談判，涉及敏感資訊</h3>
+                        <p class="text-sm text-gray-500 mt-2">70歲 精密機械董事長</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg text-gray-600 text-sm mb-6">
+                        <p class="mb-2"><i class="fas fa-lock text-gray-600 mr-2"></i>關鍵技術不能外流。</p>
+                        <p><i class="fas fa-lock text-gray-600 mr-2"></i>已鎖定特定買家，需合規審查。</p>
+                    </div>
+                    <button class="w-full bg-gray-800 text-white py-3 rounded-lg font-bold hover:bg-gray-900 transition flex justify-center items-center">
+                        進入【封閉型平台】 <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="consultant" class="hidden-section min-h-screen pt-20 fade-in bg-blue-50">
+        <div class="container mx-auto px-6">
+            <button onclick="showSection('landing')" class="mb-4 text-blue-800 hover:underline font-bold"><i class="fas fa-arrow-left"></i> 返回情境選擇</button>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-800 h-fit">
+                    <div class="flex items-center mb-4">
+                        <span class="bg-blue-800 text-white px-3 py-1 rounded text-sm font-bold mr-2">Type 1</span>
+                        [cite_start]<h2 class="text-2xl font-bold text-blue-900">顧問型平台 [cite: 16, 200-202]</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-400 uppercase mb-2">介入時機 (Trigger)</h4>
+                            <ul class="space-y-2 text-gray-700 text-sm">
+                                <li class="flex items-start"><i class="fas fa-check text-blue-500 mt-1 mr-2"></i> 創辦人開始表達退休意向</li>
+                                <li class="flex items-start"><i class="fas fa-check text-blue-500 mt-1 mr-2"></i> 家族溝通停滯</li>
+                                <li class="flex items-start"><i class="fas fa-check text-blue-500 mt-1 mr-2"></i> 企業缺乏正式接班規劃</li>
+                            </ul>
+                        </div>
+                        <div class="border-t pt-4">
+                            <h4 class="text-sm font-bold text-gray-400 uppercase mb-2">平台特色 (Features)</h4>
+                            <ul class="space-y-3 text-gray-700 text-sm">
+                                <li class="bg-blue-50 p-2 rounded border border-blue-100">
+                                    <strong><i class="fas fa-stethoscope mr-2"></i>企業診斷</strong><br>
+                                    財務/營運/風險全面快篩
+                                </li>
+                                <li class="bg-blue-50 p-2 rounded border border-blue-100">
+                                    <strong><i class="fas fa-hand-holding-heart mr-2"></i>心理/意願輔導</strong><br>
+                                    降低抗拒，協助面對傳承
+                                </li>
+                                <li class="bg-blue-50 p-2 rounded border border-blue-100">
+                                    <strong><i class="fas fa-seedling mr-2"></i>導入接班概念</strong><br>
+                                    建立外部承接的正確認知
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gray-50 border-b p-4 flex justify-between items-center">
+                        <span class="font-bold text-gray-700">平台功能演示：企業接班健檢系統</span>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">輔導模式</span>
+                    </div>
+                    <div class="p-8">
+                        <div class="flex items-start mb-8">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl mr-4 flex-shrink-0">1</div>
+                            <div class="flex-grow">
+                                <h3 class="text-lg font-bold mb-2">初步意願與心理評估</h3>
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-600 mb-3">Ｑ：您對於將經營權交給「非家族成員」的擔憂程度？</p>
+                                    <div class="w-full bg-gray-300 rounded-full h-2.5 mb-2">
+                                        <div class="bg-orange-400 h-2.5 rounded-full" style="width: 80%"></div>
+                                    </div>
+                                    <p class="text-xs text-orange-600 font-bold">系統判定：心理抗拒高。建議啟動「傳承觀念工作坊」輔導。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl mr-4 flex-shrink-0">2</div>
+                            <div class="flex-grow">
+                                <h3 class="text-lg font-bold mb-2">企業體質簡易診斷 (財務/營運)</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="border p-3 rounded text-center">
+                                        <div class="text-gray-500 text-xs">財務透明度</div>
+                                        <div class="text-red-500 font-bold text-xl">C-</div>
+                                        <div class="text-xs text-gray-400 mt-1">需會計師協助重整</div>
+                                    </div>
+                                    <div class="border p-3 rounded text-center">
+                                        <div class="text-gray-500 text-xs">獲利穩定性</div>
+                                        <div class="text-green-500 font-bold text-xl">A</div>
+                                        <div class="text-xs text-gray-400 mt-1">優質資產</div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 bg-blue-50 p-3 rounded text-sm text-blue-800 flex items-center">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    <span>顧問建議：本案具備優良獲利體質，建議先進行為期3個月的財務重整，即可進入下一階段估值。</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="comprehensive" class="hidden-section min-h-screen pt-20 fade-in bg-yellow-50">
+        <div class="container mx-auto px-6">
+            <button onclick="showSection('landing')" class="mb-4 text-yellow-700 hover:underline font-bold"><i class="fas fa-arrow-left"></i> 返回情境選擇</button>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 h-fit">
+                    <div class="flex items-center mb-4">
+                        <span class="bg-yellow-500 text-white px-3 py-1 rounded text-sm font-bold mr-2">Type 2</span>
+                        [cite_start]<h2 class="text-2xl font-bold text-yellow-700">綜合型平台 [cite: 16, 203-206]</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-400 uppercase mb-2">介入時機 (Trigger)</h4>
+                            <ul class="space-y-2 text-gray-700 text-sm">
+                                <li class="flex items-start"><i class="fas fa-check text-yellow-500 mt-1 mr-2"></i> 企業主確認外部接班可行</li>
+                                <li class="flex items-start"><i class="fas fa-check text-yellow-500 mt-1 mr-2"></i> 必須尋找買家、需要市場曝光</li>
+                                <li class="flex items-start"><i class="fas fa-check text-yellow-500 mt-1 mr-2"></i> 接班壓力增加</li>
+                            </ul>
+                        </div>
+                        <div class="border-t pt-4">
+                            <h4 class="text-sm font-bold text-gray-400 uppercase mb-2">平台特色 (Features)</h4>
+                            <ul class="space-y-3 text-gray-700 text-sm">
+                                <li class="bg-yellow-50 p-2 rounded border border-yellow-200">
+                                    <strong><i class="fas fa-bullseye mr-2"></i>案件刊登、媒合推送</strong><br>
+                                    AI 演算法精準曝光
+                                </li>
+                                <li class="bg-yellow-50 p-2 rounded border border-yellow-200">
+                                    <strong><i class="fas fa-filter mr-2"></i>資料審核與企業篩選</strong><br>
+                                    確保上架案件品質
+                                </li>
+                                <li class="bg-yellow-50 p-2 rounded border border-yellow-200">
+                                    <strong><i class="fas fa-file-contract mr-2"></i>標準化流程</strong><br>
+                                    內建 NDA 與 估值工具
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gray-50 border-b p-4 flex justify-between items-center">
+                        <span class="font-bold text-gray-700">平台功能演示：智能交易媒合看板</span>
+                        <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">市場模式</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex gap-4 mb-6">
+                            <div class="flex-1 bg-white border border-yellow-200 p-4 rounded-lg shadow-sm flex items-center">
+                                <i class="fas fa-calculator text-2xl text-yellow-500 mr-4"></i>
+                                <div>
+                                    <div class="font-bold text-gray-800">線上自動估值</div>
+                                    <div class="text-xs text-gray-500">輸入財報數據，即時產出區間</div>
+                                </div>
+                            </div>
+                            <div class="flex-1 bg-white border border-yellow-200 p-4 rounded-lg shadow-sm flex items-center">
+                                <i class="fas fa-file-signature text-2xl text-yellow-500 mr-4"></i>
+                                <div>
+                                    <div class="font-bold text-gray-800">一鍵簽署 NDA</div>
+                                    <div class="text-xs text-gray-500">標準化保密協定，加速流程</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="text-sm font-bold text-gray-500 mb-3 uppercase">推薦買家清單 (Matched Buyers)</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
+                                <div class="flex items-center">
+                                    <div class="bg-yellow-100 text-yellow-700 w-10 h-10 rounded flex items-center justify-center font-bold mr-3">A</div>
+                                    <div>
+                                        <div class="font-bold text-gray-800">教育科技控股集團</div>
+                                        <div class="text-xs text-gray-500"><i class="fas fa-check-circle text-green-500"></i> 資料已審核 | 意願度：高</div>
+                                    </div>
+                                </div>
+                                <button class="bg-yellow-500 text-white px-4 py-2 rounded text-sm hover:bg-yellow-600">推送案件</button>
+                            </div>
+                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
+                                <div class="flex items-center">
+                                    <div class="bg-gray-100 text-gray-600 w-10 h-10 rounded flex items-center justify-center font-bold mr-3">B</div>
+                                    <div>
+                                        <div class="font-bold text-gray-800">個人天使投資人</div>
+                                        <div class="text-xs text-gray-500"><i class="fas fa-check-circle text-green-500"></i> 資金證明已驗證</div>
+                                    </div>
+                                </div>
+                                <button class="border border-gray-300 text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100">查看詳情</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="closed" class="hidden-section min-h-screen pt-20 fade-in bg-gray-900 text-white">
+        <div class="container mx-auto px-6">
+            <button onclick="showSection('landing')" class="mb-4 text-gray-400 hover:text-white font-bold"><i class="fas fa-arrow-left"></i> 返回情境選擇</button>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-gray-500 h-fit">
+                    <div class="flex items-center mb-4">
+                        <span class="bg-gray-600 text-white px-3 py-1 rounded text-sm font-bold mr-2">Type 3</span>
+                        [cite_start]<h2 class="text-2xl font-bold text-white">封閉型平台 [cite: 16, 207-209]</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">介入時機 (Trigger)</h4>
+                            <ul class="space-y-2 text-gray-300 text-sm">
+                                <li class="flex items-start"><i class="fas fa-check text-green-500 mt-1 mr-2"></i> 已找到明確買家</li>
+                                <li class="flex items-start"><i class="fas fa-check text-green-500 mt-1 mr-2"></i> 進入深度談判、涉及敏感資訊</li>
+                                <li class="flex items-start"><i class="fas fa-check text-green-500 mt-1 mr-2"></i> 雙方準備進行正式交接</li>
+                            </ul>
+                        </div>
+                        <div class="border-t border-gray-700 pt-4">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">平台特色 (Features)</h4>
+                            <ul class="space-y-3 text-gray-300 text-sm">
+                                <li class="bg-gray-700 p-2 rounded border border-gray-600">
+                                    <strong><i class="fas fa-user-shield mr-2"></i>嚴格會員制+高保密媒合</strong><br>
+                                    僅限受邀方存取
+                                </li>
+                                <li class="bg-gray-700 p-2 rounded border border-gray-600">
+                                    <strong><i class="fas fa-balance-scale mr-2"></i>合規審查與契約支持</strong><br>
+                                    提供 Escrow 履約保證
+                                </li>
+                                <li class="bg-gray-700 p-2 rounded border border-gray-600">
+                                    <strong><i class="fas fa-hands-helping mr-2"></i>協助併購後整合</strong><br>
+                                    PMI 資源與人才留任信託
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
+                    <div class="bg-gray-900 border-b border-gray-700 p-4 flex justify-between items-center">
+                        <span class="font-bold text-gray-200"><i class="fas fa-lock text-green-500 mr-2"></i>VDR 虛擬資料室 & 履約管理</span>
+                        <span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">治理模式</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-8">
+                            <h3 class="text-sm font-bold text-gray-500 mb-3 uppercase">機密資料存取權限 (Access Control)</h3>
+                            <div class="bg-gray-700 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-3 pb-3 border-b border-gray-600">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-file-pdf text-red-400 mr-3"></i>
+                                        <div>
+                                            <div class="text-sm font-bold">關鍵專利技術書.pdf</div>
+                                            <div class="text-xs text-gray-400">敏感等級：極高 (浮水印開啟)</div>
+                                        </div>
+                                    </div>
+                                    <button class="bg-green-700 text-xs px-3 py-1 rounded hover:bg-green-600">授權買方A</button>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-file-excel text-green-400 mr-3"></i>
+                                        <div>
+                                            <div class="text-sm font-bold">前十大客戶合約.xlsx</div>
+                                            <div class="text-xs text-gray-400">敏感等級：高</div>
+                                        </div>
+                                    </div>
+                                    <button class="bg-gray-600 text-xs px-3 py-1 rounded cursor-not-allowed">權限鎖定</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-500 mb-3 uppercase">交易與整合支持 (Escrow & PMI)</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gray-700 p-4 rounded border-l-4 border-green-500">
+                                    <div class="text-xs text-gray-400 mb-1">履約保證金專戶</div>
+                                    <div class="text-xl font-bold text-white">NT$ 5,000,000</div>
+                                    <div class="text-xs text-green-400 mt-1"><i class="fas fa-check-circle"></i> 資金已凍結託管</div>
+                                </div>
+                                <div class="bg-gray-700 p-4 rounded border-l-4 border-blue-500">
+                                    <div class="text-xs text-gray-400 mb-1">PMI 整合進度</div>
+                                    <div class="text-xl font-bold text-white">Phase 1: 人才面談</div>
+                                    <div class="text-xs text-blue-400 mt-1"><i class="fas fa-spinner fa-spin"></i> 進行中 (顧問進駐)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.getElementById('landing').classList.add('hidden-section');
+            document.getElementById('consultant').classList.add('hidden-section');
+            document.getElementById('comprehensive').classList.add('hidden-section');
+            document.getElementById('closed').classList.add('hidden-section');
+
+            // Show selected section with animation
+            const selected = document.getElementById(sectionId);
+            selected.classList.remove('hidden-section');
+            selected.classList.remove('fade-in');
+            void selected.offsetWidth; // trigger reflow
+            selected.classList.add('fade-in');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
